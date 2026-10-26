@@ -1,0 +1,589 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <title>HoneyAcademy | Learn Something Wonderful</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #fff8fc;
+            color: #42283a;
+        }
+
+        header {
+            background: #ffffff;
+            padding: 20px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #f7dce9;
+        }
+
+        .logo {
+            color: #d63384;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        header button,
+        .primary-button {
+            background: #d63384;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            opacity: 0.88;
+        }
+
+        .hero {
+            margin: 30px auto;
+            width: 86%;
+            padding: 55px 35px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #ffe0ed, #fce7f3, #f3e8ff);
+        }
+
+        .hero h1 {
+            font-size: clamp(30px, 5vw, 48px);
+            margin: 0 0 16px;
+            color: #8f245d;
+        }
+
+        .hero p {
+            max-width: 560px;
+            line-height: 1.7;
+            color: #69465c;
+        }
+
+        main {
+            width: 86%;
+            margin: 40px auto;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .section-heading h2 {
+            color: #8f245d;
+        }
+
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 22px;
+            margin-top: 25px;
+        }
+
+        .activity-card {
+            background: white;
+            border: 1px solid #f4d6e5;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 5px 18px #7b31500d;
+        }
+
+        .activity-picture {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.activity-picture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+        .activity-info {
+            padding: 20px;
+        }
+
+        .activity-info h3 {
+            margin-top: 0;
+            color: #8f245d;
+        }
+
+        .activity-info p {
+            line-height: 1.5;
+            color: #725b6a;
+        }
+
+        .price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #d63384;
+        }
+
+        .availability {
+            font-size: 13px;
+        }
+
+        .activity-info button {
+            width: 100%;
+            margin-top: 12px;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #fce7f3;
+            color: #92265e;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .activity-info button:disabled {
+            background: #eeeeee;
+            color: #888888;
+            cursor: not-allowed;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid #f4d6e5;
+            border-radius: 18px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e7c8d9;
+            border-radius: 9px;
+            background: white;
+            font: inherit;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #f4dce8;
+            padding: 12px 0;
+        }
+
+        .remove-button {
+            border: none;
+            background: none;
+            color: #b4235b;
+            cursor: pointer;
+        }
+
+        .notice {
+            background: #fff0f6;
+            border-radius: 10px;
+            padding: 13px;
+            margin-top: 15px;
+        }
+
+        .error {
+            color: #b42318;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 15px;
+            background: #fce7f3;
+            margin-top: 50px;
+            color: #69465c;
+        }
+
+        @media (max-width: 600px) {
+            .hero {
+                padding: 35px 22px;
+            }
+
+            main, .hero {
+                width: 92%;
+            }
+
+            header {
+                padding: 18px 4%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="honeyAcademy">
+
+        <!-- Website header -->
+        <header>
+            <div class="logo">
+                <i class="fa fa-graduation-cap"></i> HoneyAcademy
+            </div>
+
+            <button @click="showCheckout = !showCheckout">
+                <i class="fa fa-shopping-bag"></i>
+                My Cart ({{ cartItemCount }})
+            </button>
+        </header>
+
+        <!-- Homepage -->
+        <div v-if="!showCheckout">
+
+            <section class="hero">
+                <h1>Little learners.<br>Big possibilities. 🌸</h1>
+
+                <p>
+                    Discover fun after-school classes that help Students
+                    explore their talents, build confidence and learn
+                    something wonderful.
+                </p>
+
+                <button class="primary-button" @click="scrollToActivities">
+                    Explore Activities
+                    <i class="fa fa-arrow-right"></i>
+                </button>
+            </section>
+
+            <main id="activities">
+                <div class="section-heading">
+                    <div>
+                        <h2>Find Your Next Favourite Class 🌸</h2>
+                        <p>Something exciting is waiting to be discovered.</p>
+                    </div>
+
+                    <select v-model="selectedCategory" style="width: auto;">
+                        <option value="All">All activities</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Arts">Arts</option>
+                        <option value="Music">Music</option>
+                        <option value="Sports">Sports</option>
+                    </select>
+                </div>
+
+                <p v-if="loading">Loading activities...</p>
+
+                <p v-if="errorMessage" class="notice error">
+                    {{ errorMessage }}
+                </p>
+
+                <div class="activity-grid">
+                    <div class="activity-card"
+                         v-for="activity in filteredActivities"
+                         :key="activity.id">
+
+                        <div class="activity-picture">
+    <img :src="'http://localhost:3000/images/' + activity.image"
+         :alt="activity.title">
+</div>
+
+                        <div class="activity-info">
+                            <h3>{{ activity.title }}</h3>
+
+                            <p>{{ activity.description }}</p>
+
+                            <p>
+                                <i class="fa fa-clock-o"></i>
+                                {{ activity.duration }}
+                            </p>
+
+                            <p class="price">
+                                Rs {{ activity.price }}
+                            </p>
+
+                            <p class="availability">
+                                {{ activity.availableInventory }} places available
+                            </p>
+
+                            <button
+                                @click="addItem(activity)"
+                                :disabled="!canAddToCart(activity)">
+
+                                {{ canAddToCart(activity)
+                                    ? 'Add to Cart +'
+                                    : 'No places available' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <p v-if="filteredActivities.length === 0">
+                    No activities found in this category.
+                </p>
+            </main>
+        </div>
+
+        <!-- Checkout page -->
+        <main v-else>
+            <button class="primary-button"
+                    @click="showCheckout = false">
+                <i class="fa fa-arrow-left"></i> Continue Exploring
+            </button>
+
+            <div class="panel">
+                <h2>Your Selected Activities 🌸</h2>
+
+                <p v-if="cart.length === 0">
+                    Your cart is empty. Let's find a class!
+                </p>
+
+                <div class="cart-item"
+                     v-for="(item, index) in cart"
+                     :key="index">
+
+                    <div>
+                        <strong>{{ item.title }}</strong>
+                        <p>Rs {{ item.price }}</p>
+                    </div>
+
+                    <button class="remove-button"
+                            @click="removeItem(index)">
+                        <i class="fa fa-trash"></i> Remove
+                    </button>
+                </div>
+
+                <h3>Total: Rs {{ cartTotal }}</h3>
+            </div>
+
+            <div class="panel">
+                <h2>Parent & Student Details</h2>
+
+                <form @submit.prevent="submitOrder">
+                    <div class="form-grid">
+                        <div>
+                            <label for="parentName">Parent's full name</label>
+                            <input id="parentName"
+                                   v-model="order.parentName"
+                                   required>
+                        </div>
+
+                        <div>
+                            <label for="email">Email address</label>
+                            <input id="email"
+                                   type="email"
+                                   v-model="order.email"
+                                   required>
+                        </div>
+
+                        <div>
+                            <label for="telephone">Telephone number</label>
+                            <input id="telephone"
+                                   type="tel"
+                                   v-model="order.telephone"
+                                   required>
+                        </div>
+
+                        <div>
+                            <label for="studentName">Student's full name</label>
+                            <input id="studentName"
+                                   v-model="order.studentName"
+                                   required>
+                        </div>
+
+                        <div>
+                            <label for="studentAge">Student's age</label>
+                            <input id="studentAge"
+                                   type="number"
+                                   min="7"
+                                   max="18"
+                                   v-model.number="order.studentAge"
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="notice">
+                        <strong>Order total: Rs {{ cartTotal }}</strong>
+                        <p>
+                            Thank You for your Purchase
+                        </p>
+                    </div>
+
+                    <button class="primary-button"
+                            type="submit"
+                            :disabled="cart.length === 0">
+                        Submit Booking Request
+                    </button>
+                </form>
+
+                <p v-if="orderMessage" class="notice">
+                    {{ orderMessage }}
+                </p>
+            </div>
+        </main>
+
+        <footer>
+            <p><strong>HoneyAcademy 🌸</strong></p>
+            <p>Helping young minds discover what they love.</p>
+            <p>&copy; 2026 HoneyAcademy</p>
+        </footer>
+    </div>
+
+    <script>
+        
+const { createApp } = Vue;
+
+const myApp = createApp({
+    data() {
+        return {
+            activities: [],
+            cart: [],
+            showCheckout: false,
+            selectedCategory: "All",
+            loading: false,
+            errorMessage: "",
+            orderMessage: "",
+
+            order: {
+                parentName: "",
+                email: "",
+                telephone: "",
+                studentName: "",
+                studentAge: ""
+            }
+        };
+    },
+
+    created() {
+        this.fetchData();
+    },
+
+    computed: {
+        // Count the activities in the cart
+        cartItemCount() {
+            return this.cart.length;
+        },
+
+        // Calculate the total price
+        cartTotal() {
+            return this.cart.reduce((total, item) => {
+                return total + Number(item.price);
+            }, 0);
+        },
+
+        // Filter activities by category
+        filteredActivities() {
+            if (this.selectedCategory === "All") {
+                return this.activities;
+            }
+
+            return this.activities.filter(activity =>
+                activity.category === this.selectedCategory
+            );
+        }
+    },
+
+    methods: {
+        // Load activities from the backend
+        async fetchData() {
+            this.loading = true;
+            this.errorMessage = "";
+
+            try {
+                const response = await fetch(
+                    "http://localhost:3000/activities"
+                );
+
+                if (!response.ok) {
+                    throw new Error("HTTP status: " + response.status);
+                }
+
+                const data = await response.json();
+
+                if (Array.isArray(data)) {
+                    this.activities = data;
+                } else {
+                    throw new Error("The activities data is not an array.");
+                }
+
+            } catch (error) {
+                console.error("Failed to load activities:", error);
+                this.errorMessage =
+                    "Could not load activities. Please make sure the backend is running.";
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        // Add an activity to the cart
+        addItem(activity) {
+            if (this.canAddToCart(activity)) {
+                this.cart.push(activity);
+                activity.availableInventory--;
+            }
+        },
+
+        // Remove an activity from the cart
+        removeItem(index) {
+            const activity = this.cart[index];
+
+            if (activity) {
+                activity.availableInventory++;
+                this.cart.splice(index, 1);
+            }
+        },
+
+        // Check available places
+        canAddToCart(activity) {
+            return activity.availableInventory > 0;
+        },
+
+        // Scroll to the activities section
+        scrollToActivities() {
+            const section = document.getElementById("activities");
+
+            if (section) {
+                section.scrollIntoView({ behavior: "smooth" });
+            }
+        },
+
+        // Display the booking confirmation message
+        submitOrder() {
+            if (this.cart.length === 0) {
+                return;
+            }
+
+            this.orderMessage =
+                "Thank you, " + this.order.parentName +
+                "! Your booking form is ready.";
+        }
+    }
+});
+
+myApp.mount("#honeyAcademy");
+
+    </script>
+</body>
+</html>
