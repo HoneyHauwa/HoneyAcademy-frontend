@@ -375,7 +375,7 @@ const app = Vue.createApp({
         // Search and sort activities
         sortedLessons() {
 
-            const search = this.searchText.trim().toLowerCase();
+            const search = this.searchText.toLowerCase();
 
             let results = this.lessons.filter(lesson =>
 
@@ -509,9 +509,9 @@ const app = Vue.createApp({
             } catch (error) {
 
                 this.errorMessage =
-                    'Unable to load activities. Check that your backend is running.';
+    'Unable to load activities. Please try again later or contact support if the problem continues.';
 
-                console.error(error);
+console.error('Error loading activities:', error);
 
             } finally {
 
