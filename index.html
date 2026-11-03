@@ -260,11 +260,11 @@
                             required>
 
                         <p v-if="customerName && !validName"
-   class="validation-message">
+                            class="validation-message">
 
-    Please enter a valid name (e.g. Hauwa Abubakar).
+                            Use letters and spaces only.
 
-</p>
+                        </p>
 
                     </div>
 
@@ -375,7 +375,7 @@ const app = Vue.createApp({
         // Search and sort activities
         sortedLessons() {
 
-            const search = this.searchText.toLowerCase();
+            const search = this.searchText.trim().toLowerCase();
 
             let results = this.lessons.filter(lesson =>
 
