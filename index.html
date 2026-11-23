@@ -492,7 +492,7 @@ const app = Vue.createApp({
 
                     topic: lesson.title,
 
-                    location: lesson.category,
+                    location: lesson.location,
 
                     price: Number(lesson.price) || 0,
 
@@ -692,13 +692,16 @@ console.error('Error loading activities:', error);
                 if (!response.ok) {
 
                     throw new Error(
+
                         result.message || 'The booking could not be completed.'
+
                     );
 
                 }
 
 
                 this.checkoutMessage =
+
                     `Thank you, ${this.customerName}! Your booking has been submitted successfully.`;
 
 
