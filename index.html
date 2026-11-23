@@ -84,7 +84,7 @@
                 <select v-model="sortBy" aria-label="Sort activities">
 
                     <option value="topic">Sort by activity</option>
-                    <option value="location">Sort by category</option>
+                    <option value="category">Sort by category</option>
                     <option value="price">Sort by price</option>
                     <option value="space">Sort by available spaces</option>
                     <option value="space">Sort by location</option>
@@ -142,7 +142,7 @@
                     <div class="activity-content">
 
                         <span class="category-tag">
-                            {{ lesson.location }}
+                            {{ lesson.category }}
                         </span>
 
                         <h3>{{ lesson.topic }}</h3>
@@ -163,6 +163,11 @@
 
                         <p class="price">
                             Rs {{ lesson.price }}
+                        </p>
+
+                        <p class="activity-detail">
+                            <i class="fa fa-map-marker"></i>
+                            {{ lesson.location }}
                         </p>
 
                         <button
@@ -492,6 +497,8 @@ const app = Vue.createApp({
                     id: lesson.id,
 
                     topic: lesson.title,
+
+                    category: lesson.category,
 
                     location: lesson.location,
 
