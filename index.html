@@ -87,7 +87,7 @@
                     <option value="category">Sort by category</option>
                     <option value="price">Sort by price</option>
                     <option value="space">Sort by available spaces</option>
-                    <option value="space">Sort by location</option>
+                    <option value="location">Sort by location</option>
 
                 </select>
 
@@ -96,6 +96,30 @@
 
                     <option value="asc">Ascending</option>
                     <option value="desc">Descending</option>
+
+                </select>
+
+            </div>
+
+
+            <!-- Explore by Teacher -->
+            <div class="controls">
+
+                <select
+                    v-model="selectedTeacher"
+                    @change="filterByTeacher"
+                    aria-label="Choose a teacher">
+
+                    <option value="">Explore by Teacher - All Teachers</option>
+
+                    <option
+                        v-for="teacher in teachers"
+                        :key="teacher.id"
+                        :value="teacher.id">
+
+                        {{ teacher.firstName }} {{ teacher.lastName }}
+
+                    </option>
 
                 </select>
 
@@ -168,6 +192,11 @@
                         <p class="activity-detail">
                             <i class="fa fa-map-marker"></i>
                             {{ lesson.location }}
+                        </p>
+
+                        <p class="activity-detail">
+                            <strong>Teacher:</strong>
+                            {{ lesson.teacherName }}
                         </p>
 
                         <button
@@ -353,6 +382,9 @@ const app = Vue.createApp({
             lessons: [],
             cart: [],
 
+            teachers: [],
+            selectedTeacher: '',
+
             showCart: false,
 
             searchText: '',
@@ -492,34 +524,154 @@ const app = Vue.createApp({
 
 
                 // Match backend fields with frontend fields
-                this.lessons = data.map(lesson => ({
+                this.lessons = data.map(lesson => {
 
-                    id: lesson.id,
+                    const teacher = this.teachers.find(
+                        teacher => teacher.id === lesson.teacherId
+                    );
 
-                    topic: lesson.title,
+                    return {
 
-                    category: lesson.category,
+                        id: lesson.id,
 
-                    location: lesson.location,
+                        topic: lesson.title,
 
-                    price: Number(lesson.price) || 0,
+                        category: lesson.category,
 
-                    space: Number(lesson.availableInventory) || 0,
+                        location: lesson.location,
 
-                    image: lesson.image || '',
+                        price: Number(lesson.price) || 0,
 
-                    description: lesson.description || '',
+                        space: Number(lesson.availableInventory) || 0,
 
-                    duration: lesson.duration || ''
+                        image: lesson.image || '',
 
-                }));
+                        description: lesson.description || '',
+
+                        duration: lesson.duration || '',
+
+                        teacherId: lesson.teacherId,
+
+                        teacherName: teacher
+                            ? `${teacher.firstName} ${teacher.lastName}`
+                            : 'Unknown'
+
+                    };
+
+                });
 
             } catch (error) {
 
                 this.errorMessage =
     'Unable to load activities. Please try again later or contact support if the problem continues.';
 
-console.error('Error loading activities:', error);
+                console.error('Error loading activities:', error);
+
+            } finally {
+
+                this.loading = false;
+
+            }
+
+        },
+
+
+        // Get teachers from Express backend
+        async fetchTeachers() {
+
+            try {
+
+                const response = await fetch(
+                    `${this.backendUrl}/teachers`
+                );
+
+                if (!response.ok) {
+
+                    throw new Error('Could not load teachers.');
+
+                }
+
+                this.teachers = await response.json();
+
+            } catch (error) {
+
+                console.error('Error loading teachers:', error);
+
+            }
+
+        },
+
+
+        // Filter activities by selected teacher
+        async filterByTeacher() {
+
+            if (!this.selectedTeacher) {
+
+                await this.fetchLessons();
+
+                return;
+
+            }
+
+            this.loading = true;
+            this.errorMessage = '';
+
+            try {
+
+                const response = await fetch(
+                    `${this.backendUrl}/teachers/${this.selectedTeacher}/activities`
+                );
+
+                if (!response.ok) {
+
+                    throw new Error('Could not load teacher activities.');
+
+                }
+
+                const data = await response.json();
+
+                this.lessons = data.map(lesson => {
+
+                    const teacher = this.teachers.find(
+                        teacher => teacher.id === lesson.teacherId
+                    );
+
+                    return {
+
+                        id: lesson.id,
+
+                        topic: lesson.title,
+
+                        category: lesson.category,
+
+                        location: lesson.location,
+
+                        price: Number(lesson.price) || 0,
+
+                        space: Number(lesson.availableInventory) || 0,
+
+                        image: lesson.image || '',
+
+                        description: lesson.description || '',
+
+                        duration: lesson.duration || '',
+
+                        teacherId: lesson.teacherId,
+
+                        teacherName: teacher
+                            ? `${teacher.firstName} ${teacher.lastName}`
+                            : 'Unknown'
+
+                    };
+
+                });
+
+            } catch (error) {
+
+                this.errorMessage =
+                    'Unable to load activities for this teacher.';
+
+                console.error('Error filtering by teacher:', error);
 
             } finally {
 
@@ -741,9 +893,11 @@ console.error('Error loading activities:', error);
 
 
     // Load activities when page opens
-    created() {
+    async created() {
 
-        this.fetchLessons();
+        await this.fetchTeachers();
+
+        await this.fetchLessons();
 
     }
 
