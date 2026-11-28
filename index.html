@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -563,7 +564,7 @@ const app = Vue.createApp({
             } catch (error) {
 
                 this.errorMessage =
-    'Unable to load activities. Please try again later or contact support if the problem continues.';
+                    'Unable to load activities. Please try again later or contact support if the problem continues.';
 
                 console.error('Error loading activities:', error);
 
@@ -791,7 +792,7 @@ const app = Vue.createApp({
         },
 
 
-        // Submit booking
+        // Submit booking using POST and update spaces using PUT
         async checkout() {
 
             if (!this.canCheckout) {
@@ -805,16 +806,26 @@ const app = Vue.createApp({
             this.checkoutMessage = '';
             this.checkoutError = '';
 
-
             try {
 
+                // Save the selected activities before checkout
+                const selectedItems = this.cart.map(item => ({
+
+                    id: item.id,
+
+                    quantity: item.quantity
+
+                }));
+
+
+                // Step 1: Create the order using POST
                 const order = {
 
                     name: this.customerName,
 
                     phone: this.customerPhone,
 
-                    lessonIds: this.cart.map(item => ({
+                    lessonIds: selectedItems.map(item => ({
 
                         lessonId: item.id,
 
@@ -860,18 +871,100 @@ const app = Vue.createApp({
                 }
 
 
+                // Step 2: Update available spaces using PUT
+                for (const item of selectedItems) {
+
+                    // Get the latest activity information
+                    const activityResponse = await fetch(
+
+                        `${this.backendUrl}/activities/${item.id}`
+
+                    );
+
+
+                    if (!activityResponse.ok) {
+
+                        throw new Error(
+                            'Could not retrieve activity information.'
+                        );
+
+                    }
+
+
+                    const activity = await activityResponse.json();
+
+
+                    const remainingSpaces =
+
+                        Number(activity.availableInventory) - item.quantity;
+
+
+                    if (remainingSpaces < 0) {
+
+                        throw new Error(
+                            'Not enough available spaces remaining.'
+                        );
+
+                    }
+
+
+                    // Update the activity using PUT
+                    const updateResponse = await fetch(
+
+                        `${this.backendUrl}/activities/${item.id}`,
+
+                        {
+
+                            method: 'PUT',
+
+                            headers: {
+
+                                'Content-Type': 'application/json'
+
+                            },
+
+                            body: JSON.stringify({
+
+                                availableInventory: remainingSpaces
+
+                            })
+
+                        }
+
+                    );
+
+
+                    const updateResult = await updateResponse.json();
+
+
+                    if (!updateResponse.ok) {
+
+                        throw new Error(
+
+                            updateResult.message ||
+                            'Could not update available spaces.'
+
+                        );
+
+                    }
+
+                }
+
+
+                // Step 3: Display successful booking message
                 this.checkoutMessage =
 
                     `Thank you, ${this.customerName}! Your booking has been submitted successfully.`;
 
 
+                // Clear the cart and customer details
                 this.cart = [];
 
                 this.customerName = '';
                 this.customerPhone = '';
 
 
-                // Refresh available spaces
+                // Refresh activities to display updated spaces
                 await this.fetchLessons();
 
 
@@ -879,7 +972,7 @@ const app = Vue.createApp({
 
                 this.checkoutError = error.message;
 
-                console.error(error);
+                console.error('Checkout error:', error);
 
             } finally {
 
